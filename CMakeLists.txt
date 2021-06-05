@@ -3,6 +3,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(jaytracer VERSION 1.0.0)
 
+## Build
+
 # Add src and header files
 file(GLOB_RECURSE SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/src/*.c
@@ -13,7 +15,20 @@ file(GLOB_RECURSE HEADER_FILES
     ${CMAKE_SOURCE_DIR}/src/*.hpp)
 
 # Bundle executable
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+set(EXECUTABLE_NAME jaytracer-core)
+add_executable(${EXECUTABLE_NAME} ${HEADER_FILES} ${SOURCE_FILES})
 
-# Build include directory
-target_include_directories(jaytracer PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+## Packages
+
+# OpenGL
+find_package(OpenGL REQUIRED)
+
+# glfw
+add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
+
+# Set libraries for linker
+set(VENDOR_LIBRARIES
+    glfw
+    OpenGL::GL
+)
+target_link_libraries(${EXECUTABLE_NAME} PRIVATE ${VENDOR_LIBRARIES})
