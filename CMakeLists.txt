@@ -26,9 +26,14 @@ find_package(OpenGL REQUIRED)
 # glfw
 add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
 
+# glew
+add_definitions(-DGLEW_STATIC)
+add_subdirectory(vendor/glew EXCLUDE_FROM_ALL)
+
 # Set libraries for linker
 set(VENDOR_LIBRARIES
-    glfw
     OpenGL::GL
+    glfw
+    libglew_static
 )
 target_link_libraries(${EXECUTABLE_NAME} PRIVATE ${VENDOR_LIBRARIES})
