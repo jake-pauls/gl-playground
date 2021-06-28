@@ -121,6 +121,11 @@ int main(void) {
     if (!glfwInit())
         return -1;
 
+    // Run OpenGL 3.3.0 in 'Core' mode
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     window = glfwCreateWindow(640, 480, "jaytracer-core", NULL, NULL);
 
     if (!window) {
@@ -150,6 +155,11 @@ int main(void) {
         2, 3, 0,
     };
 
+    // Bind vertex array buffer
+    unsigned int vertexArrayObject;
+    GLExec(glGenVertexArrays(1, &vertexArrayObject));
+    GLExec(glBindVertexArray(vertexArrayObject));
+
     // Initalize a buffer for the triangle and bind it to position data
     unsigned int vertexBuffer;
     GLExec(glGenBuffers(1, &vertexBuffer));
@@ -173,21 +183,28 @@ int main(void) {
     int uniformLocation = glGetUniformLocation(shader, "u_Color");
     ASSERT(uniformLocation != -1); // Shader was found on compilation
 
+    // Clear glBuffers
+    GLExec(glBindVertexArray(0));
+    GLExec(glUseProgram(0));
+    GLExec(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLExec(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+
     float r = 0.0f;
     float colorIncrement = 0.05f;
 
     while (!glfwWindowShouldClose(window)) {
         GLExec(glClear(GL_COLOR_BUFFER_BIT));
 
+        GLExec(glUseProgram(shader));
         GLExec(glUniform4f(uniformLocation, r, 0.3f, 0.8f, 1.0f));
+
+        GLExec(glBindVertexArray(vertexArrayObject));
+
         GLExec(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         // Basic color variation logic
-        if (r > 1.0f)
-            colorIncrement = -0.05f;
-        else if (r < 0.0f)
-            colorIncrement = 0.05f;
-
+        if (r > 1.0f) colorIncrement = -0.05f;
+        else if (r < 0.0f) colorIncrement = 0.05f;
         r += colorIncrement;
 
         glfwSwapBuffers(window);
