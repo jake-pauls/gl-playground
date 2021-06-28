@@ -90,7 +90,7 @@ int main(void) {
     if (!glfwInit())
         return -1;
 
-    window = glfwCreateWindow(640, 480, "Hello Triangle", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "jaytracer-core", NULL, NULL);
 
     if (!window) {
         glfwTerminate();
@@ -104,17 +104,30 @@ int main(void) {
 
     std::cout << "OpenGL v" << glGetString(GL_VERSION) << std::endl;
 
-    float trianglePositions[6] = {
+    // Four points of a rectangle
+    float vertexPositions[] = {
         -0.5f, -0.5f,
-         0.0f,  0.5f,
          0.5f, -0.5f,
+         0.5f,  0.5f,
+        -0.5f,  0.5f,
+    };
+
+    // Rectangle indexes, reduce redundancy (drawing two triangles) by providing indexes to repeat during draw call
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0,
     };
 
     // Initalize a buffer for the triangle and bind it to position data
-    unsigned int triangleBuffer;
-    glGenBuffers(1, &triangleBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, triangleBuffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), trianglePositions, GL_STATIC_DRAW);
+    unsigned int vertexBuffer;
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), vertexPositions, GL_STATIC_DRAW);
+
+    unsigned int indexBuffer;
+    glGenBuffers(1, &indexBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // Layout vertext buffer and attributes for OpenGL
     glEnableVertexAttribArray(0);
@@ -126,7 +139,10 @@ int main(void) {
 
     while (!glfwWindowShouldClose(window)) {
         glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // 'Elements' indicates various buffer types, 'Arrays' only applies to vertex buffers
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
