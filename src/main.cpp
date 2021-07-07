@@ -7,27 +7,9 @@
 #include <sstream>
 #include <signal.h>
 
-#define ASSERT(x) if (!(x)) raise(SIGTRAP);
-#define GLExec(x) GLClearErrors();\
-    x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
-
-/**
- * Error Handling
- */
-
-static void GLClearErrors() {
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static bool GLLogCall(const char* function, const char* file, int lineNumber) {
-    while (GLenum error = glGetError()) {
-        std::cout << "[OpenGL Error] (" << error << ") " << function << " -> " << " in " << file << " on line " << lineNumber << std::endl;
-        return false;
-    }
-
-    return true;
-}
+#include "renderer/Renderer.hpp"
+#include "VertexBuffer.hpp"
+#include "IndexBuffer.hpp"
 
 /**
  * Shader Handling
@@ -140,79 +122,73 @@ int main(void) {
         std::cout << "Failed to initialize glew after rendering OpenGL context." << std::endl;
 
     std::cout << "OpenGL v" << glGetString(GL_VERSION) << std::endl;
+    {
+        // Four points of a rectangle
+        float vertexPositions[] = {
+            -0.5f, -0.5f,   // 0
+             0.5f, -0.5f,   // 1
+             0.5f,  0.5f,   // 2
+            -0.5f,  0.5f,   // 3
+        };
 
-    // Four points of a rectangle
-    float vertexPositions[] = {
-        -0.5f, -0.5f,   // 0
-         0.5f, -0.5f,   // 1
-         0.5f,  0.5f,   // 2
-        -0.5f,  0.5f,   // 3
-    };
+        // Rectangle indexes, reduce redundancy (drawing two triangles) by providing indexes to repeat during draw call
+        unsigned int indices[] = {
+            0, 1, 2,
+            2, 3, 0,
+        };
 
-    // Rectangle indexes, reduce redundancy (drawing two triangles) by providing indexes to repeat during draw call
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0,
-    };
-
-    // Bind vertex array buffer
-    unsigned int vertexArrayObject;
-    GLExec(glGenVertexArrays(1, &vertexArrayObject));
-    GLExec(glBindVertexArray(vertexArrayObject));
-
-    // Initalize a buffer for the triangle and bind it to position data
-    unsigned int vertexBuffer;
-    GLExec(glGenBuffers(1, &vertexBuffer));
-    GLExec(glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer));
-    GLExec(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), vertexPositions, GL_STATIC_DRAW));
-
-    unsigned int indexBuffer;
-    GLExec(glGenBuffers(1, &indexBuffer));
-    GLExec(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer));
-    GLExec(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
-
-    // Layout vertex buffer and attributes for OpenGL
-    GLExec(glEnableVertexAttribArray(0));
-    GLExec(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
-
-    ShaderProgramSource source = parseShader("res/shaders/Flat.shader");
-    unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
-    GLExec(glUseProgram(shader));
-
-    // Uniform example (rendered per draw)
-    int uniformLocation = glGetUniformLocation(shader, "u_Color");
-    ASSERT(uniformLocation != -1); // Shader was found on compilation
-
-    // Clear glBuffers
-    GLExec(glBindVertexArray(0));
-    GLExec(glUseProgram(0));
-    GLExec(glBindBuffer(GL_ARRAY_BUFFER, 0));
-    GLExec(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-
-    float r = 0.0f;
-    float colorIncrement = 0.05f;
-
-    while (!glfwWindowShouldClose(window)) {
-        GLExec(glClear(GL_COLOR_BUFFER_BIT));
-
-        GLExec(glUseProgram(shader));
-        GLExec(glUniform4f(uniformLocation, r, 0.3f, 0.8f, 1.0f));
-
+        // Bind vertex array buffer
+        unsigned int vertexArrayObject;
+        GLExec(glGenVertexArrays(1, &vertexArrayObject));
         GLExec(glBindVertexArray(vertexArrayObject));
 
-        GLExec(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+        VertexBuffer vb(vertexPositions, 4 * 2 * sizeof(float));
+        IndexBuffer ib(indices, 6);
 
-        // Basic color variation logic
-        if (r > 1.0f) colorIncrement = -0.05f;
-        else if (r < 0.0f) colorIncrement = 0.05f;
-        r += colorIncrement;
+        // Layout vertex buffer and attributes for OpenGL
+        GLExec(glEnableVertexAttribArray(0));
+        GLExec(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        ShaderProgramSource source = parseShader("res/shaders/Flat.shader");
+        unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
+        GLExec(glUseProgram(shader));
+
+        // Uniform example (rendered per draw)
+        int uniformLocation = glGetUniformLocation(shader, "u_Color");
+        ASSERT(uniformLocation != -1); // Shader was found on compilation
+
+        // Clear glBuffers
+        GLExec(glBindVertexArray(0));
+        GLExec(glUseProgram(0));
+        GLExec(glBindBuffer(GL_ARRAY_BUFFER, 0));
+        GLExec(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+
+        float r = 0.0f;
+        float colorIncrement = 0.05f;
+
+        while (!glfwWindowShouldClose(window)) {
+            GLExec(glClear(GL_COLOR_BUFFER_BIT));
+
+            GLExec(glUseProgram(shader));
+            GLExec(glUniform4f(uniformLocation, r, 0.3f, 0.8f, 1.0f));
+
+            GLExec(glBindVertexArray(vertexArrayObject));
+            ib.Bind();
+
+            GLExec(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
+            // Basic color variation logic
+            if (r > 1.0f) colorIncrement = -0.05f;
+            else if (r < 0.0f) colorIncrement = 0.05f;
+            r += colorIncrement;
+
+            glfwSwapBuffers(window);
+            glfwPollEvents();
+        }
+
+        // Cleanup
+        GLExec(glDeleteProgram(shader));
     }
-
-    // Cleanup
-    GLExec(glDeleteProgram(shader));
 
     glfwTerminate();
     return 0;
