@@ -1,11 +1,9 @@
 #ifndef Renderer_h
 #define Renderer_h
 
-#include <signal.h>
-
 #include <GL/glew.h>
 
-#define ASSERT(x) if (!(x)) raise(SIGTRAP);
+#define ASSERT(x) if (!(x)) __debugbreak();
 #define GLExec(x) GLClearErrors();\
     x;\
     ASSERT(GLLogCall(#x, __FILE__, __LINE__))

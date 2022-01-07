@@ -3,7 +3,8 @@
 
 layout(location = 0) in vec4 position;
 
-void main() {
+void main() 
+{
     gl_Position = position;
 };
 
@@ -14,6 +15,7 @@ layout(location = 0) out vec4 color;
 
 uniform vec4 u_Color;
 
-void main() {
+void main() 
+{
     color = u_Color;
 };

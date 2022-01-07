@@ -15,16 +15,19 @@
  * Shader Handling
  */
 
-struct ShaderProgramSource {
+struct ShaderProgramSource 
+{
     std::string vertexSource;
     std::string fragmentSource;
 };
 
-static ShaderProgramSource parseShader(const std::string &fileHandle) {
+static ShaderProgramSource parseShader(const std::string &fileHandle) 
+{
     std::ifstream stream(fileHandle);
 
     // ShaderTypes act as index for stringstream to load shader content
-    enum class ShaderType {
+    enum class ShaderType 
+    {
         NONE = -1,
         VERTEX = 0,
         FRAGMENT = 1
@@ -34,14 +37,21 @@ static ShaderProgramSource parseShader(const std::string &fileHandle) {
     std::stringstream ss[2];
     ShaderType type = ShaderType::NONE;
 
-    while (getline(stream, line)) {
-        if (line.find("#shader") != std::string::npos) {
-            if (line.find("vertex") != std::string::npos) {
+    while(getline(stream, line)) 
+    {
+        if (line.find("#shader") != std::string::npos) 
+        {
+            if (line.find("vertex") != std::string::npos) 
+            {
                 type = ShaderType::VERTEX;
-            } else if (line.find("fragment") != std::string::npos) {
+            } 
+            else if (line.find("fragment") != std::string::npos) 
+            {
                 type = ShaderType::FRAGMENT;
             }
-        } else {
+        } 
+        else 
+        {
             ss[(int)type] << line << "\n";
         }
     }
@@ -49,7 +59,8 @@ static ShaderProgramSource parseShader(const std::string &fileHandle) {
     return { ss[0].str(), ss[1].str() };
 }
 
-static unsigned int compileShader(unsigned int type, const std::string &source) {
+static unsigned int compileShader(unsigned int type, const std::string &source) 
+{
     unsigned int shaderId = glCreateShader(type);
     const char* src = source.c_str();
 
@@ -59,11 +70,12 @@ static unsigned int compileShader(unsigned int type, const std::string &source) 
     int ivResult;
     GLExec(glGetShaderiv(shaderId, GL_COMPILE_STATUS, &ivResult));
 
-    if (ivResult == GL_FALSE) {
+    if (ivResult == GL_FALSE) 
+    {
         int length;
         GLExec(glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &length));
 
-        char* message = (char*)alloca(length * sizeof(char));
+        char* message = (char*)_malloca(length * sizeof(char));
         GLExec(glGetShaderInfoLog(shaderId, length, &length, message));
 
         std::cout << "Failed to compile " << (type == GL_VERTEX_SHADER ? "vertex" : "fragment") << " shader" << std::endl;
@@ -76,7 +88,8 @@ static unsigned int compileShader(unsigned int type, const std::string &source) 
     return shaderId;
 }
 
-static unsigned int createShader(const std::string &vertexShader, const std::string &fragmentShader) {
+static unsigned int createShader(const std::string &vertexShader, const std::string &fragmentShader) 
+{
     unsigned int glProgram = glCreateProgram();
     unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
     unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
@@ -97,7 +110,8 @@ static unsigned int createShader(const std::string &vertexShader, const std::str
  * Main Loop
  */
 
-int main(void) {
+int main(void) 
+{
     GLFWwindow* window;
 
     if (!glfwInit())
@@ -110,7 +124,8 @@ int main(void) {
 
     window = glfwCreateWindow(640, 480, "jaytracer-core", NULL, NULL);
 
-    if (!window) {
+    if (!window) 
+    {
         glfwTerminate();
         return -1;
     }
@@ -124,7 +139,8 @@ int main(void) {
     std::cout << "OpenGL v" << glGetString(GL_VERSION) << std::endl;
     {
         // Four points of a rectangle
-        float vertexPositions[] = {
+        float vertexPositions[] = 
+        {
             -0.5f, -0.5f,   // 0
              0.5f, -0.5f,   // 1
              0.5f,  0.5f,   // 2
@@ -132,7 +148,8 @@ int main(void) {
         };
 
         // Rectangle indexes, reduce redundancy (drawing two triangles) by providing indexes to repeat during draw call
-        unsigned int indices[] = {
+        unsigned int indices[] = 
+        {
             0, 1, 2,
             2, 3, 0,
         };
@@ -166,7 +183,8 @@ int main(void) {
         float r = 0.0f;
         float colorIncrement = 0.05f;
 
-        while (!glfwWindowShouldClose(window)) {
+        while (!glfwWindowShouldClose(window)) 
+        {
             GLExec(glClear(GL_COLOR_BUFFER_BIT));
 
             GLExec(glUseProgram(shader));
