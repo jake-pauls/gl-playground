@@ -8,8 +8,10 @@
 #include <signal.h>
 
 #include "renderer/Renderer.hpp"
+
 #include "VertexBuffer.hpp"
 #include "IndexBuffer.hpp"
+#include "VertexArray.hpp"
 
 /**
  * Shader Handling
@@ -21,7 +23,7 @@ struct ShaderProgramSource
     std::string fragmentSource;
 };
 
-static ShaderProgramSource parseShader(const std::string &fileHandle) 
+static ShaderProgramSource parseShader(const std::string& fileHandle) 
 {
     std::ifstream stream(fileHandle);
 
@@ -59,7 +61,7 @@ static ShaderProgramSource parseShader(const std::string &fileHandle)
     return { ss[0].str(), ss[1].str() };
 }
 
-static unsigned int compileShader(unsigned int type, const std::string &source) 
+static unsigned int compileShader(unsigned int type, const std::string& source) 
 {
     unsigned int shaderId = glCreateShader(type);
     const char* src = source.c_str();
@@ -88,7 +90,7 @@ static unsigned int compileShader(unsigned int type, const std::string &source)
     return shaderId;
 }
 
-static unsigned int createShader(const std::string &vertexShader, const std::string &fragmentShader) 
+static unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader) 
 {
     unsigned int glProgram = glCreateProgram();
     unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
@@ -141,30 +143,30 @@ int main(void)
         // Four points of a rectangle
         float vertexPositions[] = 
         {
-            -0.5f, -0.5f,   // 0
-             0.5f, -0.5f,   // 1
-             0.5f,  0.5f,   // 2
-            -0.5f,  0.5f,   // 3
+            -0.5f,  0.5f,   // 0
+            -0.5f, -0.5f,   // 1
+             0.5f, -0.5f,   // 2
+             0.5f,  0.5f,   // 3
         };
 
         // Rectangle indexes, reduce redundancy (drawing two triangles) by providing indexes to repeat during draw call
         unsigned int indices[] = 
         {
-            0, 1, 2,
-            2, 3, 0,
+            0, 1, 2,   // Bottom Left Triangle
+            2, 3, 0,   // Top Right Triangle
         };
 
         // Bind vertex array buffer
         unsigned int vertexArrayObject;
-        GLExec(glGenVertexArrays(1, &vertexArrayObject));
-        GLExec(glBindVertexArray(vertexArrayObject));
 
+        VertexArray va;
         VertexBuffer vb(vertexPositions, 4 * 2 * sizeof(float));
-        IndexBuffer ib(indices, 6);
 
-        // Layout vertex buffer and attributes for OpenGL
-        GLExec(glEnableVertexAttribArray(0));
-        GLExec(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
+        VertexBufferLayout layout;
+        layout.Push<float>(2);
+        va.AddBuffer(vb, layout);
+
+        IndexBuffer ib(indices, 6);
 
         ShaderProgramSource source = parseShader("res/shaders/Flat.shader");
         unsigned int shader = createShader(source.vertexSource, source.fragmentSource);
@@ -190,7 +192,7 @@ int main(void)
             GLExec(glUseProgram(shader));
             GLExec(glUniform4f(uniformLocation, r, 0.3f, 0.8f, 1.0f));
 
-            GLExec(glBindVertexArray(vertexArrayObject));
+            va.Bind();
             ib.Bind();
 
             GLExec(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
