@@ -1,8 +1,8 @@
-#ifndef VertexArray_hpp
-#define VertexArray_hpp
+#ifndef VertexArray_h
+#define VertexArray_h
 
-#include "VertexBuffer.hpp"
-#include "VertexBufferLayout.hpp"
+#include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 
 class VertexArray
 {
@@ -11,11 +11,11 @@ private:
 public:
 	VertexArray();
 	~VertexArray();
-	
+
 	void AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout);
 
 	void Bind() const;
 	void Unbind() const;
 };
 
-#endif /* VertexArray_hpp */
+#endif /* VertexArray_h */

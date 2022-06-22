@@ -1,7 +1,7 @@
-#ifndef VertexBuffer_hpp
-#define VertexBuffer_hpp
+#ifndef VertexBuffer_h
+#define VertexBuffer_h
 
-class VertexBuffer 
+class VertexBuffer
 {
 private:
     unsigned int m_RendererID;
@@ -14,4 +14,4 @@ public:
     void Unbind() const;
 };
 
-#endif /* VertexBuffer_hpp */
+#endif /* VertexBuffer_h */

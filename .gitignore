@@ -1,6 +1,3 @@
-# Created by https://www.toptal.com/developers/gitignore/api/visualstudio,cmake,c++
-# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,cmake,c++
-
 ### C++ ###
 # Prerequisites
 *.d
@@ -448,13 +445,18 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-### VisualStudio Patch ###
-# Additional files built by Visual Studio
+### Custom ###
 
-### Local ###
-build
-Debug
+### Premake ###
+obj/**/*
+build/**/*
 .cache
+*.make
 
-# End of https://www.toptal.com/developers/gitignore/api/visualstudio,cmake,c++
+### Builds ###
+Debug
+Release
 
+### Clangd ###
+compile_commands/**/*
+compile_commands.json
