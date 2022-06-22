@@ -1,24 +1,24 @@
-#include "VertexBuffer.hpp"
-#include "renderer/Renderer.hpp"
+#include "VertexBuffer.h"
+#include "Assert.h"
 
-VertexBuffer::VertexBuffer(const void* data, unsigned int size) 
+VertexBuffer::VertexBuffer(const void* data, unsigned int size)
 {
-    GLExec(glGenBuffers(1, &m_RendererID));
-    GLExec(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
-    GLExec(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    GL_CALL(glGenBuffers(1, &m_RendererID));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+    GL_CALL(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 }
 
-VertexBuffer::~VertexBuffer() 
+VertexBuffer::~VertexBuffer()
 {
-    GLExec(glDeleteBuffers(1, &m_RendererID));
+    GL_CALL(glDeleteBuffers(1, &m_RendererID));
 }
 
-void VertexBuffer::Bind() const 
+void VertexBuffer::Bind() const
 {
-    GLExec(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
 }
 
-void VertexBuffer::Unbind() const 
+void VertexBuffer::Unbind() const
 {
-    GLExec(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GL_CALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }

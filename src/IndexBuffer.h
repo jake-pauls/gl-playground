@@ -1,7 +1,7 @@
-#ifndef IndexBuffer_hpp
-#define IndexBuffer_hpp
+#ifndef IndexBuffer_h
+#define IndexBuffer_h
 
-class IndexBuffer 
+class IndexBuffer
 {
 private:
     unsigned int m_RendererID;
@@ -17,4 +17,4 @@ public:
     inline unsigned int GetCount() const { return m_Count; }
 };
 
-#endif /* IndexBuffer_hpp */
+#endif /* IndexBuffer_h */

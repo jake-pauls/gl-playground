@@ -1,0 +1,2 @@
+# Remove glad as a vendored path
+glad/** linguist-vendored=false
