@@ -1,2 +1,5 @@
 # Remove glad as a vendored path
-glad/** linguist-vendored=false
+vender/glad/** linguist-vendored=false
+
+# Remove stb_image as a vendored path
+vendor/stb_image/** linguist-vendored=false

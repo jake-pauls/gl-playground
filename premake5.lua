@@ -25,13 +25,15 @@ workspace "gl-playground"
 	-- Indivdual Deps
 	include "vendor/glfw.premake.lua"
 	include "vendor/glad.premake.lua"
+	include "vendor/stb_image.premake.lua"
 
 project "gl-playground"
     kind "ConsoleApp"
 
 	includedirs {
 		"vendor/glfw/include",
-		"vendor/glad/include"
+		"vendor/glad/include",
+		"vendor/stb_image"
 	}
 
     files {
@@ -41,7 +43,8 @@ project "gl-playground"
 
 	links {
 		"glfw",
-		"glad"
+		"glad",
+		"stb_image"
 	}
 
 	filter "system:linux"
@@ -52,3 +55,4 @@ project "gl-playground"
 
 	includeexternal "vendor/glfw.premake.lua"
 	includeexternal "vendor/glad.premake.lua"
+	includeexternal "vendor/stb_image.premake.lua"
