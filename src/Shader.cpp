@@ -39,6 +39,16 @@ void Shader::SetUniform4f(const std::string& name, float f0, float f1, float f2,
 	GL_CALL(glUniform4f(GetUniformLocation(name), f0, f1, f2, f3));
 }
 
+void Shader::SetUniformMatrix3fv(const std::string& name, const float* matrix)
+{
+	GL_CALL(glUniformMatrix3fv(GetUniformLocation(name), 1, GL_FALSE, matrix));
+}
+
+void Shader::SetUniformMatrix4fv(const std::string& name, const float* matrix)
+{
+	GL_CALL(glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, matrix));
+}
+
 ShaderProgramSource Shader::ParseShader(const std::string& filePath)
 {
     std::ifstream stream(filePath);

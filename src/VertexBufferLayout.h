@@ -9,9 +9,9 @@
 
 struct VertexBufferElement
 {
-	unsigned int count;
-	unsigned int type;
-	unsigned char normalized;
+	unsigned int Count;
+	unsigned int Type;
+	unsigned char Normalized;
 
 	static unsigned int GetSizeOfType(unsigned int type)
 	{
@@ -31,6 +31,7 @@ class VertexBufferLayout
 private:
 	std::vector<VertexBufferElement> m_Elements;
 	unsigned int m_Stride;
+
 public:
 	VertexBufferLayout() : m_Stride(0) {}
 

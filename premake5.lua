@@ -22,17 +22,13 @@ workspace "gl-playground"
         optimize "On"
         symbols "Off"
 
-	-- Indivdual Deps
-	include "vendor/glfw.premake.lua"
-	include "vendor/glad.premake.lua"
-	include "vendor/stb_image.premake.lua"
-
 project "gl-playground"
     kind "ConsoleApp"
 
 	includedirs {
 		"vendor/glfw/include",
 		"vendor/glad/include",
+		"vendor/glm",
 		"vendor/stb_image"
 	}
 
@@ -53,6 +49,8 @@ project "gl-playground"
 	filter "system:windows"
 		defines { "_WINDOWS" }
 
-	includeexternal "vendor/glfw.premake.lua"
-	includeexternal "vendor/glad.premake.lua"
-	includeexternal "vendor/stb_image.premake.lua"
+	-- Individual Deps
+	include "vendor/glfw.premake.lua"
+	include "vendor/glad.premake.lua"
+	include "vendor/glm.premake.lua"
+	include "vendor/stb_image.premake.lua"
